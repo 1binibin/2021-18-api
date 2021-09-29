@@ -1,4 +1,4 @@
-// npm i express uuid dotenv cors ejs mysql2 http-errors jsonwebtoken lodash numeral moment morgan
+// npm i express uuid dotenv cors ejs mysql2 http-errors jsonwebtoken lodash numeral moment morgan fs- extra
 // npm i express lodash numeral moment dotenv ejs cors mysql2 sequelize passport uuid multer http-errors express-session helmet morgan
 
 /*************** global init *****************/
@@ -7,6 +7,7 @@ const port = process.env.PORT
 const path = require('path')
 const express = require('express')
 const app = express()
+const jwt = require('jsonwebtoken');
 
 
 /*************** server init  *****************/
@@ -30,10 +31,14 @@ app.use('/',express.static( path.join(__dirname, 'public') ))
 
 
 /*************** router init *****************/
-// const Router = require('./routes/')
-
-// app.use('/', Router)
-
+app.get('/token', (req, res, next) => {
+	let token = jwt.sign({ 
+		userid: 'wonbin',
+		nickname: '비니빈' 
+		}, 
+		process.env.JWT_KEY, { expiresIn: 60 * 60 })
+	res.send(token)
+})
 
 /*************** error init *****************/
 const _404Router = require('./routes/error/404-router')
