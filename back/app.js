@@ -8,6 +8,7 @@ const path = require('path')
 const express = require('express')
 const app = express()
 const jwt = require('jsonwebtoken');
+const cors = require('cors')
 
 
 /*************** server init  *****************/
@@ -21,8 +22,10 @@ app.locals.pretty = true
 
 
 /*************** Middleware *****************/
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
+
 
 
 /*************** static init *****************/
@@ -32,7 +35,9 @@ app.use('/',express.static( path.join(__dirname, 'public') ))
 
 /*************** router init *****************/
 const apiRouter = require('./routes/api')
+const devRouter = require('./routes/dev')
 app.use('/api', apiRouter)
+app.use('/dev', devRouter)
 
 
 app.get('/token', (req, res, next) => {
