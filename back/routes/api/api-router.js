@@ -1,3 +1,4 @@
+const { json } = require('express')
 const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken')
@@ -7,11 +8,9 @@ router.get('/', async (req, res, next) => {
 	let token = req.headers.authorization
 	let sql
 	try {
-		jwt.verify(token, process.env.JWT_SALT, async (err, decoded) => {
+		jwt.verify(token, process.env.JWT_SALT, async (err, decode) => {
 			if(err) {
-				// res.status(401).json({ err: '토큰이 만료되었습니다.' }) 
-				data = { idx: rs[0].idx, userid: rs[0].userid }
-				token = jwt.sign(data, process.env.JWT_SALT, { expiresIn: '10s' })
+				res.status(401).json({ err: '토큰이 만료되었습니다.' })
 			}
 			else {
 				sql = " SELECT * FROM books ORDER BY idx DESC "
@@ -20,10 +19,9 @@ router.get('/', async (req, res, next) => {
 			}
 		})
 	}
-	catch (err) {
+	catch(err) {
 		res.status(500).json(err)
 	}
 })
-
 
 module.exports = router

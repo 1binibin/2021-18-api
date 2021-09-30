@@ -1,45 +1,40 @@
-// npm i express uuid dotenv cors ejs mysql2 http-errors jsonwebtoken lodash numeral moment morgan
-// npm i express lodash numeral moment dotenv ejs cors mysql2 sequelize passport uuid multer http-errors express-session helmet morgan
-
-/*************** global init *****************/
+/*************** global init **************/
 require('dotenv').config()
 const port = process.env.PORT
 const path = require('path')
 const express = require('express')
 const app = express()
+const cors = require('cors')
 
 
-/*************** server init  *****************/
+/*************** server init **************/
 require('./modules/server-init')(app, process.env.PORT)
 
 
-/*************** view engine *****************/
+/************** view engine ***************/
 app.set('view engine', 'ejs')
 app.set('views', './views')
 app.locals.pretty = true
 
 
-/*************** Middleware *****************/
+/*************** middleware ***************/
+app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 
-/*************** static init *****************/
-app.use('/',express.static( path.join(__dirname, 'public') ))
+/*************** static init **************/
+app.use('/', express.static(path.join(__dirname, 'public')))
+
+
+/*************** router init **************/
 
 
 
-/*************** router init *****************/
-// const Router = require('./routes/')
-
-// app.use('/', Router)
-
-
-/*************** error init *****************/
+/**************** error init **************/
 const _404Router = require('./routes/error/404-router')
 const _500Router = require('./routes/error/500-router')
 
 app.use(_404Router)
 app.use(_500Router)
-
 
