@@ -1,23 +1,22 @@
-const { json } = require('express')
 const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken')
 const { pool } = require('../../modules/mysql-init')
 
 router.get('/', async (req, res, next) => {
-	let token = req.headers.authorization
-	let sql
+	let sql, token
 	try {
-		jwt.verify(token, process.env.JWT_SALT, async (err, decode) => {
-			if(err) {
-				res.status(401).json({ err: '토큰이 만료되었습니다.' })
-			}
-			else {
-				sql = " SELECT * FROM books ORDER BY idx DESC "
-				const [books] = await pool.execute(sql)
-				res.status(200).json({ success: true, books })
-			}
-		})
+		if(req.cookies.token) {
+			const verifyToken = jwt.verify(req.cookies.token, process.env.JWT_SALT)
+			token = jwt.sign({ data: verifyToken.data }, process.env.JWT_SALT, { expiresIn: '10s' })
+		}
+		else {
+			sql = " SELECT * FROM users_api WHERE apikey=? AND domain=? "
+			const [rs] = await pool.execute(sql, [req.query.apikey, req.headers.origin])
+			token = jwt.sign({ data: rs[0] }, process.env.JWT_SALT, { expiresIn: '10s' })
+		}
+		res.cookie('token', token, { expires: new Date(Date.now() + 10000) })
+		res.json({ success: true, msg: '쿠키발행' })
 	}
 	catch(err) {
 		res.status(500).json(err)
